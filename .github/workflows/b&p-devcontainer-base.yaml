@@ -3,7 +3,7 @@ name: Build and Push Base
 on:
   push:
     tags:
-      - "devcontainer/base-v*.*.*"
+      - "base-v*.*.*"
 
 env:
   REGISTRY: ghcr.io
