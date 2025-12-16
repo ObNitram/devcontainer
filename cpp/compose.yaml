@@ -1,0 +1,14 @@
+
+services:
+  devcontainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: devcontainer:latest
+    container_name: devcontainer_app
+    # Uncomment and adjust the lines below as needed:
+    # volumes:
+    #   - ./:/workspace
+    # ports:
+    #   - "3000:3000"
+

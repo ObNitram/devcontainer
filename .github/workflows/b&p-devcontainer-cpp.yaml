@@ -7,9 +7,9 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: devcontainer/base
-  BUILD_CONTEXT: ./base
-  FILE_PATH: ./base/Dockerfile
+  IMAGE_NAME: devcontainer/cpp
+  BUILD_CONTEXT: ./cpp
+  FILE_PATH: ./cpp/Dockerfile
 
 jobs:
   build-and-push:
