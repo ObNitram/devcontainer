@@ -1,4 +1,4 @@
-name: Build and Push Base
+name: Build and Push Cpp
 
 on:
   push:
