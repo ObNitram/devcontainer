@@ -5,7 +5,6 @@ services:
       context: .
       dockerfile: Dockerfile
     image: devcontainer:latest
-    container_name: devcontainer_app
     # Uncomment and adjust the lines below as needed:
     # volumes:
     #   - ./:/workspace

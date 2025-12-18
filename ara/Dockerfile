@@ -37,10 +37,9 @@ RUN set -eux; \
     mkdir -p /opt/ara; \
     cd /opt/ara; \
     if [ ! -d "hadoop-${HADOOP_VERSION}" ]; then \
-    wget --progress=bar:force \
-    -O hadoop-${HADOOP_VERSION}.tar.gz \
+    wget -q -O hadoop-${HADOOP_VERSION}.tar.gz \
     https://miroir.univ-lorraine.fr/apache/hadoop/common/stable/hadoop-${HADOOP_VERSION}.tar.gz; \
-    tar -xvzf hadoop-${HADOOP_VERSION}.tar.gz; \
+    tar -xzf hadoop-${HADOOP_VERSION}.tar.gz; \
     rm -f hadoop-${HADOOP_VERSION}.tar.gz; \
     fi
 
@@ -48,10 +47,9 @@ RUN set -eux; \
 RUN set -eux; \
     cd /opt/ara; \
     if [ ! -d "hbase-${HBASE_VERSION}" ]; then \
-    wget --progress=bar:force \
-    -O hbase-${HBASE_VERSION}-bin.tar.gz \
+    wget -q -O hbase-${HBASE_VERSION}-bin.tar.gz \
     https://archive.apache.org/dist/hbase/stable/hbase-${HBASE_VERSION}-bin.tar.gz; \
-    tar -xvzf hbase-${HBASE_VERSION}-bin.tar.gz; \
+    tar -xzf hbase-${HBASE_VERSION}-bin.tar.gz; \
     rm -f hbase-${HBASE_VERSION}-bin.tar.gz; \
     fi
 
@@ -59,10 +57,9 @@ RUN set -eux; \
 RUN set -eux; \
     cd /opt/ara; \
     if [ ! -d "apache-zookeeper-${ZOOKEEPER_VERSION}-bin" ]; then \
-    wget --progress=bar:force \
-    -O apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz \
+    wget -q -O apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz \
     https://dlcdn.apache.org/zookeeper/stable/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz; \
-    tar -xvzf apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz; \
+    tar -xzf apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz; \
     rm -f apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz; \
     fi
 
@@ -80,7 +77,7 @@ ENV PATH=$PATH:$MY_ZOOKEEPER_HOME/bin
 ENV MY_HBASE_HOME=$TOOLS_PATH/hbase-2.5.13
 ENV PATH=$PATH:$MY_HBASE_HOME/bin
 
-CMD ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
+CMD ["/bin/bash", "-c", "sudo /usr/sbin/sshd && sleep infinity"]
 
 USER vscode
 WORKDIR /home/vscode

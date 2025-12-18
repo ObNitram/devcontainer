@@ -3,7 +3,7 @@ name: Build and Push ara
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "ara-v*.*.*"
 
 env:
   REGISTRY: ghcr.io
@@ -46,9 +46,9 @@ jobs:
           #       type=semver,pattern={{major}}
           #       type=sha
           tags: |
-            type=match,pattern=.*(v\d+\.\d+\.\d+),group=1
-            type=match,pattern=.*(v\d+\.\d+)\.\d+,group=1
-            type=match,pattern=.*(v\d+)\.\d+\.\d+,group=1
+            type=match,pattern=.*-(v\d+\.\d+\.\d+),group=1
+            type=match,pattern=.*-(v\d+\.\d+)\.\d+,group=1
+            type=match,pattern=.*-(v\d+)\.\d+\.\d+,group=1
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
