@@ -26,16 +26,17 @@ RUN curl -s "https://get.sdkman.io" | bash && \
     sdk install sbt 1.11.7
 
 
-USER root
+USER vscode
 
+ARG INSTALL_PATH="/home/vscode/apps"
 ARG HADOOP_VERSION=3.4.2
 ARG HBASE_VERSION=2.5.13
 ARG ZOOKEEPER_VERSION=3.8.5
 
 
 RUN set -eux; \
-    mkdir -p /opt/ara; \
-    cd /opt/ara; \
+    mkdir -p ${INSTALL_PATH}; \
+    cd ${INSTALL_PATH}; \
     if [ ! -d "hadoop-${HADOOP_VERSION}" ]; then \
     wget -q -O hadoop-${HADOOP_VERSION}.tar.gz \
     https://miroir.univ-lorraine.fr/apache/hadoop/common/stable/hadoop-${HADOOP_VERSION}.tar.gz; \
@@ -43,14 +44,13 @@ RUN set -eux; \
     rm -f hadoop-${HADOOP_VERSION}.tar.gz; \
     fi
 
-COPY hadoop/core-site.xml /opt/ara/hadoop-${HADOOP_VERSION}/etc/hadoop/core-site.xml
-COPY hadoop/hdfs-site.xml /opt/ara/hadoop-${HADOOP_VERSION}/etc/hadoop/hdfs-site.xml
-COPY hadoop/mapred-site.xml /opt/ara/hadoop-${HADOOP_VERSION}/etc/hadoop/mapred-site.xml
-COPY hadoop/yarn-site.xml /opt/ara/hadoop-${HADOOP_VERSION}/etc/hadoop/yarn-site.xml
-
+COPY hadoop/core-site.xml ${INSTALL_PATH}/hadoop-${HADOOP_VERSION}/etc/hadoop/core-site.xml
+COPY hadoop/hdfs-site.xml ${INSTALL_PATH}/hadoop-${HADOOP_VERSION}/etc/hadoop/hdfs-site.xml
+COPY hadoop/mapred-site.xml ${INSTALL_PATH}/hadoop-${HADOOP_VERSION}/etc/hadoop/mapred-site.xml
+COPY hadoop/yarn-site.xml ${INSTALL_PATH}/hadoop-${HADOOP_VERSION}/etc/hadoop/yarn-site.xml
 
 RUN set -eux; \
-    cd /opt/ara; \
+    cd ${INSTALL_PATH}; \
     if [ ! -d "hbase-${HBASE_VERSION}" ]; then \
     wget -q -O hbase-${HBASE_VERSION}-bin.tar.gz \
     https://archive.apache.org/dist/hbase/stable/hbase-${HBASE_VERSION}-bin.tar.gz; \
@@ -58,11 +58,11 @@ RUN set -eux; \
     rm -f hbase-${HBASE_VERSION}-bin.tar.gz; \
     fi
 
-COPY hbase/hbase-site.xml /opt/ara/hbase-${HBASE_VERSION}/conf/hbase-site.xml
+COPY hbase/hbase-site.xml ${INSTALL_PATH}/hbase-${HBASE_VERSION}/conf/hbase-site.xml
 
 
 RUN set -eux; \
-    cd /opt/ara; \
+    cd ${INSTALL_PATH}; \
     if [ ! -d "apache-zookeeper-${ZOOKEEPER_VERSION}-bin" ]; then \
     wget -q -O apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz \
     https://dlcdn.apache.org/zookeeper/stable/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz; \
@@ -70,24 +70,29 @@ RUN set -eux; \
     rm -f apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz; \
     fi
 
-COPY zookeeper/zoo.cfg /opt/ara/apache-zookeeper-${ZOOKEEPER_VERSION}-bin/conf/zoo.cfg
+COPY zookeeper/zoo.cfg ${INSTALL_PATH}/apache-zookeeper-${ZOOKEEPER_VERSION}-bin/conf/zoo.cfg
+
+RUN cp /home/vscode/.bashrc /home/vscode/.bashrc_custom && \
+    : > /home/vscode/.bashrc && \
+    echo "export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> /home/vscode/.bashrc && \
+    echo "export INSTALL_PATH=${INSTALL_PATH}" >> /home/vscode/.bashrc && \
+    echo "export MY_HADOOP_HOME=${INSTALL_PATH}/hadoop-${HADOOP_VERSION}" >> /home/vscode/.bashrc && \
+    echo 'export HADOOP_HOME=$MY_HADOOP_HOME' >> /home/vscode/.bashrc && \
+    echo 'export PATH=$PATH:$MY_HADOOP_HOME/bin:$MY_HADOOP_HOME/sbin' >> /home/vscode/.bashrc && \
+    echo "export MY_ZOOKEEPER_HOME=${INSTALL_PATH}/apache-zookeeper-${ZOOKEEPER_VERSION}-bin" >> /home/vscode/.bashrc && \
+    echo 'export PATH=$PATH:$MY_ZOOKEEPER_HOME/bin' >> /home/vscode/.bashrc && \
+    echo "export MY_HBASE_HOME=${INSTALL_PATH}/hbase-${HBASE_VERSION}" >> /home/vscode/.bashrc && \
+    echo 'export PATH=$PATH:$MY_HBASE_HOME/bin' >> /home/vscode/.bashrc && \
+    echo '' >> /home/vscode/.bashrc && \
+    cat /home/vscode/.bashrc_custom >> /home/vscode/.bashrc && \
+    rm /home/vscode/.bashrc_custom && \
+    chown vscode:vscode /home/vscode/.bashrc
 
 
-ARG TOOLS_PATH="/opt/ara/"
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
-ENV MY_HADOOP_HOME=$TOOLS_PATH/hadoop-3.4.2
-ENV PATH=$PATH:$MY_HADOOP_HOME/bin:$MY_HADOOP_HOME/sbin
-ENV HADOOP_HOME=$MY_HADOOP_HOME
-
-ENV MY_ZOOKEEPER_HOME=$TOOLS_PATH/apache-zookeeper-3.8.5-bin
-ENV PATH=$PATH:$MY_ZOOKEEPER_HOME/bin
-
-ENV MY_HBASE_HOME=$TOOLS_PATH/hbase-2.5.13
-ENV PATH=$PATH:$MY_HBASE_HOME/bin
 
 # Setup ssh
-RUN mkdir -p /run/sshd
+RUN sudo mkdir -p /run/sshd
 
 # Prepare SSH directory
 RUN mkdir -p /home/vscode/.ssh \
@@ -95,7 +100,7 @@ RUN mkdir -p /home/vscode/.ssh \
     && chown vscode:vscode /home/vscode/.ssh
 
 # Generate SSH key pair for vscode and authorize it
-RUN sudo -u vscode ssh-keygen \
+RUN ssh-keygen \
     -t ed25519 \
     -f /home/vscode/.ssh/id_ed25519 \
     -N "" \
@@ -112,7 +117,10 @@ RUN printf "Host localhost 127.0.0.1\n\
     && chown -R vscode:vscode /home/vscode/.ssh
 
 
-USER vscode
-WORKDIR /home/vscode
+COPY scripts /home/vscode/.local/bin
+RUN sudo chmod +x /home/vscode/.local/bin/*
 
+
+WORKDIR /home/vscode
 CMD ["/bin/bash", "-c", "sudo /usr/sbin/sshd && sleep infinity"]
+
