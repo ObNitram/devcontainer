@@ -3,7 +3,7 @@ name: Build and Push Cpp
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "cpp-v*.*.*"
 
 env:
   REGISTRY: ghcr.io
@@ -46,9 +46,9 @@ jobs:
           #       type=semver,pattern={{major}}
           #       type=sha
           tags: |
-            type=match,pattern=.*(v\d+\.\d+\.\d+),group=1
-            type=match,pattern=.*(v\d+\.\d+)\.\d+,group=1
-            type=match,pattern=.*(v\d+)\.\d+\.\d+,group=1
+            type=match,pattern=.*-(v\d+\.\d+\.\d+),group=1
+            type=match,pattern=.*-(v\d+\.\d+)\.\d+,group=1
+            type=match,pattern=.*-(v\d+)\.\d+\.\d+,group=1
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
