@@ -77,7 +77,33 @@ ENV PATH=$PATH:$MY_ZOOKEEPER_HOME/bin
 ENV MY_HBASE_HOME=$TOOLS_PATH/hbase-2.5.13
 ENV PATH=$PATH:$MY_HBASE_HOME/bin
 
-CMD ["/bin/bash", "-c", "sudo /usr/sbin/sshd && sleep infinity"]
+# Setup ssh
+RUN mkdir -p /run/sshd
+
+# Prepare SSH directory
+RUN mkdir -p /home/vscode/.ssh \
+    && chmod 700 /home/vscode/.ssh \
+    && chown vscode:vscode /home/vscode/.ssh
+
+# Generate SSH key pair for vscode and authorize it
+RUN sudo -u vscode ssh-keygen \
+    -t ed25519 \
+    -f /home/vscode/.ssh/id_ed25519 \
+    -N "" \
+    && cat /home/vscode/.ssh/id_ed25519.pub >> /home/vscode/.ssh/authorized_keys \
+    && chmod 600 /home/vscode/.ssh/authorized_keys \
+    && chown vscode:vscode /home/vscode/.ssh/authorized_keys
+
+# Setup config
+RUN printf "Host localhost 127.0.0.1\n\
+    StrictHostKeyChecking no\n\
+    UserKnownHostsFile /dev/null\n\
+    LogLevel ERROR\n" > /home/vscode/.ssh/config \
+    && chmod 600 /home/vscode/.ssh/config \
+    && chown -R vscode:vscode /home/vscode/.ssh
+
 
 USER vscode
 WORKDIR /home/vscode
+
+CMD ["/bin/bash", "-c", "sudo /usr/sbin/sshd && sleep infinity"]
