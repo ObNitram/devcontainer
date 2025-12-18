@@ -43,6 +43,11 @@ RUN set -eux; \
     rm -f hadoop-${HADOOP_VERSION}.tar.gz; \
     fi
 
+COPY hadoop/core-site.xml /opt/ara/hadoop-${HADOOP_VERSION}/etc/hadoop/core-site.xml
+COPY hadoop/hdfs-site.xml /opt/ara/hadoop-${HADOOP_VERSION}/etc/hadoop/hdfs-site.xml
+COPY hadoop/mapred-site.xml /opt/ara/hadoop-${HADOOP_VERSION}/etc/hadoop/mapred-site.xml
+COPY hadoop/yarn-site.xml /opt/ara/hadoop-${HADOOP_VERSION}/etc/hadoop/yarn-site.xml
+
 
 RUN set -eux; \
     cd /opt/ara; \
@@ -53,6 +58,8 @@ RUN set -eux; \
     rm -f hbase-${HBASE_VERSION}-bin.tar.gz; \
     fi
 
+COPY hbase/hbase-site.xml /opt/ara/hbase-${HBASE_VERSION}/conf/hbase-site.xml
+
 
 RUN set -eux; \
     cd /opt/ara; \
@@ -62,6 +69,8 @@ RUN set -eux; \
     tar -xzf apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz; \
     rm -f apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz; \
     fi
+
+COPY zookeeper/zoo.cfg /opt/ara/apache-zookeeper-${ZOOKEEPER_VERSION}-bin/conf/zoo.cfg
 
 
 ARG TOOLS_PATH="/opt/ara/"
