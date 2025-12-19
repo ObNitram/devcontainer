@@ -4,7 +4,7 @@ USER root
 
 # deps
 RUN apt-get update -y && apt-get upgrade -y && \
-    apt-get install -y wget openjdk-17-jdk curl zip unzip ca-certificates openssh-server
+    apt-get install -y wget openjdk-17-jdk curl zip unzip ca-certificates openssh-server file jq
 
 # (1) s'assurer que /home/vscode est writable par vscode
 RUN mkdir -p /home/vscode && \
