@@ -1,14 +1,14 @@
-name: Build and Push ara
+name: Build and Push Datacloud
 
 on:
   push:
     tags:
-      - "ara-v*.*.*"
+      - "datacloud-v*.*.*"
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: devcontainer/ara
-  BUILD_CONTEXT: ./ara
+  IMAGE_NAME: devcontainer/datacloud
+  BUILD_CONTEXT: ./datacloud
   FILE_PATH: ./ara/Dockerfile
 
 jobs:
