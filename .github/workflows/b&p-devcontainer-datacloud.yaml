@@ -9,7 +9,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: devcontainer/datacloud
   BUILD_CONTEXT: ./datacloud
-  FILE_PATH: ./ara/Dockerfile
+  FILE_PATH: ./datacloud/Dockerfile
 
 jobs:
   build-and-push:
