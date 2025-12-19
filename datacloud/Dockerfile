@@ -121,6 +121,7 @@ COPY scripts /home/vscode/.local/bin
 RUN sudo chmod +x /home/vscode/.local/bin/*
 
 
+USER vscode
 WORKDIR /home/vscode
 CMD ["/bin/bash", "-c", "sudo /usr/sbin/sshd && sleep infinity"]
 

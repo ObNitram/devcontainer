@@ -1,5 +1,7 @@
 FROM ghcr.io/obnitram/devcontainer/base:latest
 
+USER root
+
 # Install dependencies
 RUN apt-get update -y && apt-get upgrade -y
 
@@ -13,5 +15,6 @@ RUN apt-get install -y \
     cppcheck        \
     valgrind       
 
-
+USER vscode
+WORKDIR /home/vscode
 CMD [ "sleep" , "infinity" ]
